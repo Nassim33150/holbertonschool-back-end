@@ -17,6 +17,7 @@ if __name__ == "__main__":
     """ get all usertasks """
     tasks = requests.get('https://jsonplaceholder.typicode.com/todos')
 
+    """ write to CSV """
     with open(f"{USER_ID}.csv", mode='w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for task in tasks.json():

@@ -1,17 +1,18 @@
 #!/usr/bin/python3
+""" Records all tasks that are owned by this employee """
 import sys
 import requests
 import json
 
 if __name__ == "__main__":
-    Id = sys.argv[1]
+    USER_ID = sys.argv[1]
 
     """ get userinformations with request"""
     users = requests.get("https://jsonplaceholder.typicode.com/users/{}"
-                         .format(Id))
+                         .format(USER_ID))
 
     """ get username """
-    username = users.json().get('name')
+    USERNAME = users.json().get('name')
 
     """ get all usertasks """
     tasks = requests.get('https://jsonplaceholder.typicode.com/todos')
@@ -19,18 +20,20 @@ if __name__ == "__main__":
     dictionary = {}
 
     for task in tasks.json():
-        if task.get('userId') == int(Id):
+        if task.get('userId') == int(USER_ID):
+            TASK_COMPLETED_STATUS = task.get('completed')
+            TASK_TITLE = task.get('title')
             dictionary = {
-                Id: [
+                USER_ID: [
                     {
-                        "task": task.get("title"),
-                        "completed": task.get("completed"),
-                        "username": username
+                        "task": TASK_TITLE,
+                        "completed": TASK_COMPLETED_STATUS,
+                        "username": USERNAME
                     }
                 ]
             }
 
     json_object = json.dumps(dictionary)
 
-    with open(f"{Id}.json", "w") as outfile:
+    with open(f"{USER_ID}.json", "w") as outfile:
         outfile.write(json_object)

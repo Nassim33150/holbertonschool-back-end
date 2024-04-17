@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""For a given employee ID, returns information about
+"""For a given employe ID, returns information about
 their todo list progress"""
 import sys
 import requests

@@ -1,38 +1,19 @@
 #!/usr/bin/python3
-import requests
+"""export data in the JSON format."""
 import json
+import requests
 
-""" Records all tasks from all employees """
 if __name__ == "__main__":
-    
-    users = requests.get("https://jsonplaceholder.typicode.com/users").json()
+    URL = "https://jsonplaceholder.typicode.com"
 
-    
-    tasks = requests.get('https://jsonplaceholder.typicode.com/todos').json()
-
-    
-    user_tasks = {}
-
-    
+    users = requests.get(f"{URL}/users").json()
+    dic_user = {}
     for user in users:
-        user_id = user['id']
-        username = user['name']
-
-        
-        user_task_list = []
-
-        
+        tasks = requests.get(f"{URL}/users/{user['id']}/todos").json()
+        dic_user[user["id"]] = []
         for task in tasks:
-            if task['userId'] == user_id:
-                user_task_list.append({
-                    "username": username,
-                    "task": task["title"],
-                    "completed": task["completed"]
-                })
-
-        
-        user_tasks[user_id] = user_task_list
-
-    
-    with open("todo_all_employees.json", "w") as outfile:
-        json.dump(user_tasks, outfile)
+            dic_task = {"task": task["title"], "completed": task["completed"],
+                        "username": user["username"]}
+            dic_user[user["id"]].append(dic_task)
+    with open("todo_all_employees.json", "w") as file:
+        json.dump(dic_user, file)

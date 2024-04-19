@@ -1,39 +1,27 @@
 #!/usr/bin/python3
-""" Records all tasks that are owned by this employee """
-import sys
-import requests
+"""export data in the JSON format."""
 import json
+import requests
+import sys
 
 if __name__ == "__main__":
-    USER_ID = sys.argv[1]
+    if len(sys.argv) < 2:
+        print(f"missing employee id as argument")
+        sys.exit(1)
 
-    """ get userinformations with request"""
-    users = requests.get("https://jsonplaceholder.typicode.com/users/{}"
-                         .format(USER_ID))
+    URL = "https://jsonplaceholder.typicode.com"
+    EMPLOYEE_ID = sys.argv[1]
 
-    """ get username """
-    USERNAME = users.json().get('name')
+    EMPLOYEE_TODOS = requests.get(f"{URL}/users/{EMPLOYEE_ID}/todos",
+                                  params={"_expand": "user"})
+    data = EMPLOYEE_TODOS.json()
 
-    """ get all usertasks """
-    tasks = requests.get('https://jsonplaceholder.typicode.com/todos')
-
-    dictionary = {}
-
-    for task in tasks.json():
-        if task.get('userId') == int(USER_ID):
-            TASK_COMPLETED_STATUS = task.get('completed')
-            TASK_TITLE = task.get('title')
-            dictionary = {
-                USER_ID: [
-                    {
-                        "task": TASK_TITLE,
-                        "completed": TASK_COMPLETED_STATUS,
-                        "username": USERNAME
-                    }
-                ]
-            }
-
-    json_object = json.dumps(dictionary)
-
-    with open(f"{USER_ID}.json", "w") as outfile:
-        outfile.write(json_object)
+    username = data[0]["user"]["username"]
+    USER_TASK = {EMPLOYEE_ID: []}
+    for task in data:
+        dic_task = {"task": task["title"], "completed": task["completed"],
+                    "username": username}
+        USER_TASK[EMPLOYEE_ID].append(dic_task)
+    fileName = f"{EMPLOYEE_ID}.json"
+    with open(fileName, "w") as file:
+        json.dump(USER_TASK, file)
